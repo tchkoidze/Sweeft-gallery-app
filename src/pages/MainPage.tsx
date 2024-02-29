@@ -6,15 +6,15 @@ const apiUrl = "https://api.unsplash.com";
 
 interface Photo {
   id: string;
-  downloads:number;
-  likes:number;
-  views:number;
+  downloads: number;
+  likes: number;
+  views: number;
   urls: {
-    full:string;
-    raw:string;
+    full: string;
+    raw: string;
     regular: string;
-    small:string;
-    thumb:string;
+    small: string;
+    thumb: string;
   };
   alt_description: string;
   width: number;
@@ -29,7 +29,7 @@ function MainPage() {
   const photos = useQuery({
     queryKey: ["popular_photos"],
     queryFn: () =>
-      //axios
+      axios
         .get(`${apiUrl}/photos?page=1&per_page=20&order_by=popular`, {
           headers: { Authorization: `Client-ID ${accessKey}` },
         })
@@ -43,7 +43,11 @@ function MainPage() {
     <div>
       <h1>ეს არის მთავარი გვერდი</h1>
       {photos.data.map((photo: Photo) => (
-        <img  key={photo.id} src={photo.urls.regular} alt={photo.alt_description} />
+        <img
+          key={photo.id}
+          src={photo.urls.regular}
+          alt={photo.alt_description}
+        />
       ))}
     </div>
   );
