@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
+import useDebounce from "../hooks/useDebounce";
 
 const accessKey = "8odbcWMjbrbIQNaomRBZSmIdlFgUFFKO6EECa_M7s9I";
 const apiUrl = "https://api.unsplash.com";
@@ -28,24 +29,16 @@ const headers = {
 
 function MainPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const photos = useQuery({
-    queryKey: ["photos", searchTerm],
-    queryFn: () => {
-      if (searchTerm.trim() === "") {
-        return axios
-          .get(`${apiUrl}/photos?page=1&per_page=20&order_by=popular`, {
-            headers: { Authorization: `Client-ID ${accessKey}` },
-          })
-          .then((res) => res.data);
-      } else {
-        return axios
-          .get(
-            `https://api.unsplash.com/photos/?client_id=YOUR_ACCESS_KEY&per_page=20&query=${searchTerm}`
-          )
-          .then((res) => res.data);
-      }
-    },
+    queryKey: ["photos", debouncedSearchTerm],
+    queryFn: async () =>
+      await axios
+        .get(
+          `https://api.unsplash.com/photos/?client_id=${accessKey}&per_page=20&query=${debouncedSearchTerm}`
+        )
+        .then((res) => res.data),
   });
 
   if (photos.isPending) return "Loading...";
@@ -58,7 +51,7 @@ function MainPage() {
         type="text"
         placeholder="Search..."
         value={searchTerm}
-        onChange={handleSearchChange}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
       {photos.data.map((photo: Photo) => (
         <img
@@ -71,3 +64,21 @@ function MainPage() {
   );
 }
 export default MainPage;
+
+/*
+queryFn: async () => {
+      if (searchTerm.trim() === "") {
+        return await axios
+          .get(`${apiUrl}/photos?page=1&per_page=20&order_by=popular`, {
+            headers: { Authorization: `Client-ID ${accessKey}` },
+          })
+          .then((res) => res.data);
+      } else {
+        return await axios
+          .get(
+            `https://api.unsplash.com/photos/?client_id=${accessKey}&per_page=20&query=${debouncedSearchTerm}`
+          )
+          .then((res) => res.data);
+      }
+    },
+*/
