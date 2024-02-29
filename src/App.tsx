@@ -1,17 +1,16 @@
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { Navigate, Route, Routes } from "react-router-dom";
+
+import HistoryPage from "./pages/HistoryPage";
+import MainPage from "./pages/MainPage";
 
 function App() {
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
+      <Routes>
+        <Route path="/" element={<Navigate to="მთავარი" />} />
+        <Route path="/მთავარი" element={<MainPage />} />
+        <Route path="/ისტორია" element={<HistoryPage />} />
+      </Routes>
     </>
   );
 }
