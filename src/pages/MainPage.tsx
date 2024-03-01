@@ -31,18 +31,39 @@ function MainPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const photos = useQuery({
+  console.log("1", debouncedSearchTerm);
+
+  const { data, error, isPending } = useQuery({
     queryKey: ["photos", debouncedSearchTerm],
-    queryFn: async () =>
-      await axios
-        .get(
-          `https://api.unsplash.com/photos/?client_id=${accessKey}&per_page=20&query=${debouncedSearchTerm}`
-        )
-        .then((res) => res.data),
+    queryFn: async () => {
+      if (searchTerm.trim() === "") {
+        return await axios
+          .get(`${apiUrl}/photos?page=1&per_page=20&order_by=popular`, {
+            headers: { Authorization: `Client-ID ${accessKey}` },
+          })
+          .then((res) => {
+            console.log("2", debouncedSearchTerm);
+            return res.data;
+          });
+      } else {
+        if (debouncedSearchTerm) {
+          return await axios
+
+            .get(
+              `https://api.unsplash.com/search/photos/?client_id=${accessKey}&per_page=20&query=${debouncedSearchTerm}`
+            )
+            .then((res) => {
+              console.log("3", debouncedSearchTerm);
+              console.log(res.data.results);
+              return res.data.results;
+            });
+        }
+      }
+    },
   });
 
-  if (photos.isPending) return "Loading...";
-  if (photos.error) return "An error has occurred: " + photos.error.message;
+  if (isPending) return "Loading...";
+  if (error) return "An error has occurred: " + error.message;
 
   return (
     <div>
@@ -53,7 +74,8 @@ function MainPage() {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      {photos.data.map((photo: Photo) => (
+
+      {data.map((photo: Photo) => (
         <img
           key={photo.id}
           src={photo.urls.regular}
@@ -76,9 +98,28 @@ queryFn: async () => {
       } else {
         return await axios
           .get(
-            `https://api.unsplash.com/photos/?client_id=${accessKey}&per_page=20&query=${debouncedSearchTerm}`
+            `https://api.unsplash.com/search/photos/?client_id=${accessKey}&per_page=20&query=${debouncedSearchTerm}`
           )
-          .then((res) => res.data);
+          .then((res) => {
+          console.log(res.data.results);
+          return res.data.results;
+        });
       }
     },
+*/
+
+/*
+const { data, error, isPending } = useQuery({
+    queryKey: ["photos"],
+    queryFn: async () =>
+      await axios
+        .get(`${apiUrl}/photos?page=1&per_page=20&order_by=popular`, {
+          headers: { Authorization: `Client-ID ${accessKey}` },
+        })
+        .then((res) => {
+          console.log(res);
+          return res.data;
+        }),
+  });
+
 */
