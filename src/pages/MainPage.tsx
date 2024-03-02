@@ -48,6 +48,8 @@ function MainPage() {
           .then((res) => {
             console.log("page: ", page);
             console.log("2", debouncedSearchTerm);
+            //setAllPhotos((previouse))
+            setAllPhotos((prevPhotos) => [...prevPhotos, ...res.data]);
             return res.data;
           });
       } else {
@@ -61,6 +63,10 @@ function MainPage() {
               console.log("page: ", page);
               console.log("3", debouncedSearchTerm);
               console.log(res.data.results);
+              setAllPhotos((prevPhotos) => [
+                ...prevPhotos,
+                ...res.data.results,
+              ]);
               return res.data.results;
             });
         }
@@ -120,14 +126,34 @@ function MainPage() {
   return (
     <div>
       <h1>ეს არის მთავარი გვერდი</h1>
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+      <div>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => (
+            setSearchTerm(e.target.value), setPage(1), setAllPhotos([])
+          )}
+        />
+      </div>
 
-      {data.map((photo: Photo) => (
+      {/*data.map((photo: Photo) => (
+        <img
+          key={photo.id}
+          src={photo.urls.regular}
+          alt={photo.alt_description}
+        />
+      ))*/}
+      <div className="grid grid-cols-4 gap-1">
+        {allPhotos.map((photo: Photo) => (
+          <img
+            key={photo.id}
+            src={photo.urls.regular}
+            alt={photo.alt_description}
+          />
+        ))}
+      </div>
+      {allPhotos.map((photo: Photo) => (
         <img
           key={photo.id}
           src={photo.urls.regular}
