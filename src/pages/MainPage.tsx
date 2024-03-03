@@ -31,7 +31,8 @@ function MainPage() {
 
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
 
-  console.log("1", debouncedSearchTerm);
+  const [showModal, setSowModal] = useState<boolean>(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo>();
 
   const { data, error, isPending, isLoading, isError } = useQuery({
     queryKey: ["photos", debouncedSearchTerm, page],
@@ -107,8 +108,6 @@ function MainPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isLoading, isError, page]);
 
-  //[isLoading, isError, data]
-
   useEffect(() => {
     // Get existing search terms array from local storage or initialize an empty array
     //const existingSearchTerms = JSON.parse(localStorage.getItem("searchTerms")) || [];
@@ -129,11 +128,11 @@ function MainPage() {
   if (error) return "An error has occurred: " + error.message;
 
   return (
-    <div>
-      <h1>ეს არის მთავარი გვერდი</h1>
-      <div>
+    <div className="px-6">
+      <div className="flex justify-between py-3">
         <Link to="/ისტორია">ისტორია</Link>
         <input
+          className="w-[20%] border border-gray-500 rounded"
           type="text"
           placeholder="Search..."
           value={searchTerm}
@@ -143,144 +142,38 @@ function MainPage() {
         />
       </div>
 
-      {/*data.map((photo: Photo) => (
-        <img
-          key={photo.id}
-          src={photo.urls.regular}
-          alt={photo.alt_description}
-        />
-      ))*/}
       <div className="grid grid-cols-4 gap-1">
         {allPhotos.map((photo: Photo) => (
           <img
             key={photo.id}
             src={photo.urls.regular}
             alt={photo.alt_description}
+            className="h-[350px]"
+            onClick={() => (setSowModal(!showModal), setSelectedPhoto(photo))}
           />
         ))}
       </div>
+      {showModal && (
+        <div
+          className="flex gap-4 items-center   fixed top-0 left-0 bg-black bg-opacity-90"
+          onClick={() => setSowModal(false)}
+        >
+          <img
+            className="w-[60%] h-[60%]"
+            src={selectedPhoto?.urls.full}
+            alt={selectedPhoto?.alt_description}
+          />
+          <div
+            className="text-white
+          "
+          >
+            <p>likes: {selectedPhoto?.likes}</p>
+            <p>views: {selectedPhoto?.views}</p>
+            <p>downloads: {selectedPhoto?.downloads}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 export default MainPage;
-
-/*
-queryFn: async () => {
-      if (searchTerm.trim() === "") {
-        return await axios
-          .get(`${apiUrl}/photos?page=1&per_page=20&order_by=popular`, {
-            headers: { Authorization: `Client-ID ${accessKey}` },
-          })
-          .then((res) => res.data);
-      } else {
-        return await axios
-          .get(
-            `https://api.unsplash.com/search/photos/?client_id=${accessKey}&per_page=20&query=${debouncedSearchTerm}`
-          )
-          .then((res) => {
-          console.log(res.data.results);
-          return res.data.results;
-        });
-      }
-    },
-*/
-
-/*
-const { data, error, isPending } = useQuery({
-    queryKey: ["photos"],
-    queryFn: async () =>
-      await axios
-        .get(`${apiUrl}/photos?page=1&per_page=20&order_by=popular`, {
-          headers: { Authorization: `Client-ID ${accessKey}` },
-        })
-        .then((res) => {
-          console.log(res);
-          return res.data;
-        }),
-  });
-
-*/
-
-/* *****
-function MainPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
-  const [page, setPage] = useState(1);
-  //const [isFetching, setIsFetching] = useState(false);
-
-  console.log("1", debouncedSearchTerm);
-
-  const { data, error, isPending, isLoading, isError } = useQuery({
-    queryKey: ["photos", debouncedSearchTerm, page],
-    queryFn: async () => {
-      if (searchTerm.trim() === "") {
-        return await axios
-          .get(`${apiUrl}/photos?page=${page}&per_page=20&order_by=popular`, {
-            headers: { Authorization: `Client-ID ${accessKey}` },
-          })
-          .then((res) => {
-            console.log("page: ", page);
-            console.log("2", debouncedSearchTerm);
-            return res.data;
-          });
-      } else {
-        if (debouncedSearchTerm) {
-          return await axios
-
-            .get(
-              `https://api.unsplash.com/search/photos/?client_id=${accessKey}&page=${page}&per_page=20&query=${debouncedSearchTerm}`
-            )
-            .then((res) => {
-              console.log("page: ", page);
-              console.log("3", debouncedSearchTerm);
-              console.log(res.data.results);
-              return res.data.results;
-            });
-        }
-      }
-    },
-    //keepPreviousData: true,
-    refetchOnWindowFocus: false,
-  });
-
-  const handleScroll = () => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop ===
-        document.documentElement.offsetHeight &&
-      !isLoading &&
-      !isError &&
-      data.length >= 20
-    ) {
-      setPage((prevPage) => prevPage + 1);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isLoading, isError, data]);
-
-  if (isPending) return "Loading...";
-  if (error) return "An error has occurred: " + error.message;
-
-  return (
-    <div>
-      <h1>ეს არის მთავარი გვერდი</h1>
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
-      {data.map((photo: Photo) => (
-        <img
-          key={photo.id}
-          src={photo.urls.regular}
-          alt={photo.alt_description}
-        />
-      ))}
-    </div>
-  );
-}
-*/

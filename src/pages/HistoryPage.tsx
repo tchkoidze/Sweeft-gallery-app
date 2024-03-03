@@ -31,6 +31,9 @@ function HistoryPage() {
 
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
 
+  const [showModal, setSowModal] = useState<boolean>(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo>();
+
   useEffect(() => {
     const existingSearchTerms = JSON.parse(
       localStorage.getItem("searchTerms")!
@@ -39,19 +42,20 @@ function HistoryPage() {
   }, []);
 
   const { data, error, isPending, isLoading, isError } = useQuery({
-    queryKey: ["photo", searchword],
+    queryKey: ["photo", searchword, page],
     queryFn: async () => {
       //if (searchword === null) return [];
       if (!searchword) return [];
       try {
         console.log(searchword);
         const response = await axios.get(
-          `${apiUrl}/search/photos?page=1&per_page=20&query=${searchword}`,
+          `${apiUrl}/search/photos?page=${page}&per_page=20&query=${searchword}`,
           {
             headers: { Authorization: `Client-ID ${accessKey}` },
           }
         );
         console.log(response.data.results);
+        setAllPhotos((prevPhotos) => [...prevPhotos, ...response.data.results]);
         return response.data.results; // Return the data from the Promise
       } catch (err: any) {
         throw new Error(err.response.data); // Throw any caught errors
@@ -59,17 +63,38 @@ function HistoryPage() {
     },
   });
 
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop ===
+        document.documentElement.offsetHeight &&
+      !isLoading &&
+      !isError &&
+      data.length >= 20
+    ) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isLoading, isError, page]);
+
   if (error) return "An error has occurred: " + error.message;
 
   return (
-    <div>
-      <h1>ეს არის ისტრიის გვერდი</h1>
-      <Link to="/მთავარი">მთავარი</Link>
+    <div className="px-6 pt-4">
+      <p className="py-4">
+        დაბრუნდი <Link to="/მთავარი">მთავარზე</Link>
+      </p>
+
       <ul>
         {history.map((word, index) => (
           <li
             key={index}
-            onClick={() => (console.log(word), setsearchWord(word))}
+            onClick={() => (
+              console.log(word), setsearchWord(word), setAllPhotos([])
+            )}
             className="   link:text-purple-600 visited:text-purple-600 hover:text-purple-600 active:text-purple-600"
           >
             {word}
@@ -79,15 +104,43 @@ function HistoryPage() {
         ))}
       </ul>
       <div className="grid grid-cols-4 gap-1">
-        {data &&
+        {/*data &&
           data.map((photo: Photo) => (
             <img
               key={photo.id}
               src={photo.urls.regular}
               alt={photo.alt_description}
             />
-          ))}
+          ))*/}
+        {allPhotos.map((photo: Photo) => (
+          <img
+            key={photo.id}
+            src={photo.urls.regular}
+            alt={photo.alt_description}
+            onClick={() => (setSowModal(!showModal), setSelectedPhoto(photo))}
+          />
+        ))}
       </div>
+      {showModal && (
+        <div
+          className="flex gap-4 items-center   fixed top-0 left-0 bg-black bg-opacity-90"
+          onClick={() => setSowModal(false)}
+        >
+          <img
+            className="w-[60%] h-[60%]"
+            src={selectedPhoto?.urls.regular}
+            alt={selectedPhoto?.alt_description}
+          />
+          <div
+            className="text-white
+          "
+          >
+            <p>likes: {selectedPhoto?.likes}</p>
+            <p>views: {selectedPhoto?.views}</p>
+            <p>downloads: {selectedPhoto?.downloads}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
