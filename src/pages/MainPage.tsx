@@ -2,6 +2,7 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import useDebounce from "../hooks/useDebounce";
+import { Link } from "react-router-dom";
 
 const accessKey = "8odbcWMjbrbIQNaomRBZSmIdlFgUFFKO6EECa_M7s9I";
 const apiUrl = "https://api.unsplash.com";
@@ -48,7 +49,7 @@ function MainPage() {
           .then((res) => {
             console.log("page: ", page);
             console.log("2", debouncedSearchTerm);
-            //setAllPhotos((previouse))
+
             setAllPhotos((prevPhotos) => [...prevPhotos, ...res.data]);
             return res.data;
           });
@@ -78,26 +79,19 @@ function MainPage() {
     //refetchOnWindowFocus: false,
   });
 
-  //
+  //*** */
   useEffect(() => {
     if (data && page === 1) {
+      console.log(allPhotos);
       setAllPhotos(data);
     } else if (data && page > 1) {
+      console.log(allPhotos);
+
+      //setAllPhotos((prevPhotos) => [...prevPhotos, ...uniquePhotos]);
       setAllPhotos((prevPhotos) => [...prevPhotos, ...data]);
     }
   }, [data, page]);
 
-  /*const handleScroll = () => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop ===
-        document.documentElement.offsetHeight &&
-      !isLoading &&
-      !isError
-      //&&data.length >= 20
-    ) {
-      setPage((prevPage) => prevPage + 1);
-    }
-  };*/
   const handleScroll = () => {
     const isScrolledToBottom =
       window.innerHeight + document.documentElement.scrollTop ===
@@ -127,6 +121,7 @@ function MainPage() {
     <div>
       <h1>ეს არის მთავარი გვერდი</h1>
       <div>
+        <Link to="/ისტორია">ისტორია</Link>
         <input
           type="text"
           placeholder="Search..."
@@ -153,13 +148,6 @@ function MainPage() {
           />
         ))}
       </div>
-      {allPhotos.map((photo: Photo) => (
-        <img
-          key={photo.id}
-          src={photo.urls.regular}
-          alt={photo.alt_description}
-        />
-      ))}
     </div>
   );
 }
