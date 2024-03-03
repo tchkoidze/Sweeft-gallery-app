@@ -26,6 +26,11 @@ interface Photo {
 function HistoryPage() {
   const [searchword, setsearchWord] = useState<string>("");
   const [history, setHistory] = useState([]);
+
+  const [page, setPage] = useState(1);
+
+  const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
+
   useEffect(() => {
     const existingSearchTerms = JSON.parse(
       localStorage.getItem("searchTerms")!
@@ -54,6 +59,8 @@ function HistoryPage() {
     },
   });
 
+  if (error) return "An error has occurred: " + error.message;
+
   return (
     <div>
       <h1>ეს არის ისტრიის გვერდი</h1>
@@ -63,22 +70,15 @@ function HistoryPage() {
           <li
             key={index}
             onClick={() => (console.log(word), setsearchWord(word))}
+            className="   link:text-purple-600 visited:text-purple-600 hover:text-purple-600 active:text-purple-600"
           >
             {word}
             {isLoading && <p>{isPending}</p>}
             {isError && <p>{isError}</p>}
-            {/*data &&
-              data.map((photo: Photo) => (
-                <img
-                  key={photo.id}
-                  src={photo.urls.regular}
-                  alt={photo.alt_description}
-                />
-              ))*/}
           </li>
         ))}
       </ul>
-      <div>
+      <div className="grid grid-cols-4 gap-1">
         {data &&
           data.map((photo: Photo) => (
             <img

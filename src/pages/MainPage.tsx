@@ -28,7 +28,6 @@ function MainPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [page, setPage] = useState(1);
-  //const [isFetching, setIsFetching] = useState(false);
 
   const [allPhotos, setAllPhotos] = useState<Photo[]>([]);
 
