@@ -110,6 +110,22 @@ function MainPage() {
 
   //[isLoading, isError, data]
 
+  useEffect(() => {
+    // Get existing search terms array from local storage or initialize an empty array
+    //const existingSearchTerms = JSON.parse(localStorage.getItem("searchTerms")) || [];
+    // Get existing search terms array from local storage or initialize an empty array
+    const existingSearchTermsString = localStorage.getItem("searchTerms")!;
+    const existingSearchTerms = existingSearchTermsString
+      ? JSON.parse(existingSearchTermsString)
+      : [];
+
+    // Append the new debounced search term to the existing array
+    const updatedSearchTerms = [...existingSearchTerms, debouncedSearchTerm];
+
+    // Save the updated array back to local storage
+    localStorage.setItem("searchTerms", JSON.stringify(updatedSearchTerms));
+  }, [debouncedSearchTerm]);
+
   if (isPending) return "Loading...";
   if (error) return "An error has occurred: " + error.message;
 
