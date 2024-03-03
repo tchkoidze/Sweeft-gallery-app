@@ -104,14 +104,6 @@ function HistoryPage() {
         ))}
       </ul>
       <div className="grid grid-cols-4 gap-1">
-        {/*data &&
-          data.map((photo: Photo) => (
-            <img
-              key={photo.id}
-              src={photo.urls.regular}
-              alt={photo.alt_description}
-            />
-          ))*/}
         {allPhotos.map((photo: Photo) => (
           <img
             key={photo.id}
@@ -146,14 +138,3 @@ function HistoryPage() {
 }
 
 export default HistoryPage;
-
-/*
-queryFn: () =>
-      axios
-        .get(`${apiUrl}/photos?per_page=20&query=${searchword}`, {
-          headers: { Authorization: `Client-ID ${accessKey}` },
-        })
-        .then((res) => {
-          console.log(res.data);
-          return res.data;
-        }),*/

@@ -54,7 +54,7 @@ function MainPage() {
           return await axios
 
             .get(
-              `https://api.unsplash.com/search/photos/?client_id=${accessKey}&page=${page}&per_page=20&query=${debouncedSearchTerm}`
+              `${apiUrl}/search/photos/?client_id=${accessKey}&page=${page}&per_page=20&query=${debouncedSearchTerm}`
             )
             .then((res) => {
               console.log("page: ", page);
@@ -69,13 +69,10 @@ function MainPage() {
         }
       }
     },
-    //keepPreviousData: true,
+
     placeholderData: keepPreviousData,
-    //
-    //refetchOnWindowFocus: false,
   });
 
-  //*** */
   useEffect(() => {
     if (data && page === 1) {
       console.log(allPhotos);
@@ -83,7 +80,6 @@ function MainPage() {
     } else if (data && page > 1) {
       console.log(allPhotos);
 
-      //setAllPhotos((prevPhotos) => [...prevPhotos, ...uniquePhotos]);
       setAllPhotos((prevPhotos) => [...prevPhotos, ...data]);
     }
   }, [data, page]);
